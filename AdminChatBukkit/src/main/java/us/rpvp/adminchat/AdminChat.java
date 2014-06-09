@@ -21,8 +21,8 @@ import static org.bukkit.ChatColor.*;
 public class AdminChat extends JavaPlugin implements PluginMessageListener, Listener, CommandExecutor {
 
 	String serverName;
-	String mainChannel = "Bridge";
 	String subChannel = "AdminChat";
+	String pluginChannel = "BungeeCord";
 	String PERMISSION_USE_COMMAND = "adminchat.use";
 	String PERMISSION_RECEIVE_CHAT = "adminchat.receive";
 
@@ -33,8 +33,8 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 		serverName = getConfig().getString("serverName");
 
-		getServer().getMessenger().registerOutgoingPluginChannel(this, mainChannel);
-		getServer().getMessenger().registerIncomingPluginChannel(this, mainChannel, this);
+		getServer().getMessenger().registerOutgoingPluginChannel(this, pluginChannel);
+		getServer().getMessenger().registerIncomingPluginChannel(this, pluginChannel, this);
 
 		getServer().getPluginManager().registerEvents(this, this);
 
@@ -68,20 +68,22 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		if(channel.equals(mainChannel)) {
+		if(!channel.equals(pluginChannel)) {
+			return;
+		}
+		try {
 			DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-			try {
-				in.readFully(message);
-				while(in.available() > 0) {
-					System.out.print(in.readUTF());
-					String subChannel = in.readUTF();
-					if(subChannel.equals(subChannel)) {
-						sendStaffMessage(in.readUTF(), Bukkit.getPlayer(in.readUTF()), in.readUTF());
-					}
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
+			String subchannel = in.readUTF();
+			short len = in.readShort();
+			byte[] msgBytes = new byte[len];
+			in.readFully(msgBytes);
+			DataInputStream msgIn = new DataInputStream(new ByteArrayInputStream(msgBytes));
+
+			if(subchannel.equals(subChannel)) {
+				sendStaffMessage(msgIn.readUTF(), Bukkit.getPlayer(msgIn.readUTF()), msgIn.readUTF());
 			}
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -94,14 +96,22 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 	}
 
 	public void sendBungeePayload(Player player, String message) {
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(b);
 		try {
-			out.writeUTF(subChannel);
-			out.writeUTF(serverName);
-			out.writeUTF(player.getName());
-			out.writeUTF(message);
-			player.sendPluginMessage(this, mainChannel, b.toByteArray());
+			ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
+			DataOutputStream msgOut = new DataOutputStream(msgBytes);
+			msgOut.writeUTF(subChannel);
+			msgOut.writeUTF(serverName);
+			msgOut.writeUTF(player.getName());
+			msgOut.writeShort(message.length());
+
+			ByteArrayOutputStream b = new ByteArrayOutputStream();
+			DataOutputStream out = new DataOutputStream(b);
+			out.writeUTF("Forward");
+			out.writeUTF("ALL");
+			out.writeUTF("AdminChat");
+			out.writeShort(msgBytes.toByteArray().length);
+			out.write(msgBytes.toByteArray());
+			player.sendPluginMessage(this, pluginChannel, b.toByteArray());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

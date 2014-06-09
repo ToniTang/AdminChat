@@ -9,6 +9,8 @@ import net.md_5.bungee.event.EventHandler;
 
 public class AdminChatBungee extends Plugin implements Listener {
 
+	String pluginChannel = "BungeeCord";
+
 	public void onEnable() {
 		ProxyServer.getInstance().getPluginManager().registerListener(this, this);
 	}
@@ -18,7 +20,7 @@ public class AdminChatBungee extends Plugin implements Listener {
 		if((event.getData() != null) && (ProxyServer.getInstance().getOnlineCount() != 0)) {
 			for(ServerInfo server : ProxyServer.getInstance().getServers().values()) {
 				if(!server.getPlayers().isEmpty())
-					server.sendData("Bridge", event.getData());
+					server.sendData(pluginChannel, event.getData());
 			}
 		}
 	}
