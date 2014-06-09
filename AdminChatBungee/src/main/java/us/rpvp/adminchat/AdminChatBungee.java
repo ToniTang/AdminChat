@@ -21,7 +21,6 @@ public class AdminChatBungee extends Plugin implements Listener {
 		if(!event.getTag().equalsIgnoreCase(pluginChannel)) {
 			return;
 		}
-		System.out.print(pluginChannel + " received a message!");
 		for(ServerInfo server : ProxyServer.getInstance().getServers().values()) {
 			if(!server.getPlayers().isEmpty())
 				server.sendData(pluginChannel, event.getData());

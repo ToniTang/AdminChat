@@ -5,6 +5,6 @@ url: http://realmsofpvp.net/
 version: ${project.version}
 
 commands:
-  achat:
-    usage: /achat <message>
+  a:
+    usage: /a <message>
     description: Allow use of the admin chat

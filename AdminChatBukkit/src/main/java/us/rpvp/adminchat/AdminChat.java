@@ -39,13 +39,13 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 		getServer().getPluginManager().registerEvents(this, this);
 
-		getCommand("achat").setExecutor(this);
+		getCommand("a").setExecutor(this);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player player = (Player) sender;
-		if(cmd.getName().equalsIgnoreCase("achat")) {
+		if(cmd.getName().equalsIgnoreCase("a")) {
 			if(player.hasPermission(PERMISSION_USE_COMMAND) || player.isOp()) {
 				if(args.length > 0) {
 					String message = buildString(args);
@@ -112,7 +112,7 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 				staff.sendMessage(DARK_GRAY + "[" + GOLD.toString() + "Staff Chat" + DARK_GRAY + "][" + YELLOW + serverName + DARK_GRAY + "] " + DARK_RED + senderName + " " + DARK_GRAY + "» " + GREEN + translateAlternateColorCodes('&', message));
 			}
 		}
-		Bukkit.getLogger().info("[Staff Chat] " + senderName + " » " + message);
+		Bukkit.getLogger().info("[Staff Chat][" + serverName + "] " + senderName + " » " + message);
 	}
 
 	public String buildString(String[] args) {
