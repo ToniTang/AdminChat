@@ -1,0 +1,10 @@
+name: AdminChat
+author: ToniTang
+main: us.rpvp.adminchat.AdminChat
+url: http://realmsofpvp.net/
+version: ${project.version}
+
+commands:
+  achat:
+    usage: /achat <message>
+    description: Allow use of the admin chat

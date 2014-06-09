@@ -1,0 +1,9 @@
+# IntelliJ Related Files
+*.iml
+.idea/
+
+# Builds are not to be pushed
+target/
+
+# POM not needed
+dependency-reduced-pom.xml
