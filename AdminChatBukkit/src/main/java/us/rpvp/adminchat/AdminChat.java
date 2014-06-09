@@ -22,6 +22,7 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	String serverName;
 	String mainChannel = "Bridge";
+	String subChannel = "AdminChat";
 	String PERMISSION_USE_COMMAND = "adminchat.use";
 	String PERMISSION_RECEIVE_CHAT = "adminchat.receive";
 
@@ -41,31 +42,6 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 	}
 
 	@Override
-	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		if(channel.equals(mainChannel)) {
-			DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-			try {
-				while(in.available() > 0) {
-					System.out.print(in.readUTF());
-					String subChannel = in.readUTF();
-					if(subChannel.equals("AdminChat")) {
-						sendStaffMessage(in.readUTF(), Bukkit.getPlayer(in.readUTF()), in.readUTF());
-					}
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent event) {
-		if(isInAdminChat(event.getPlayer().getUniqueId())) {
-			sendBungeePayload(event.getPlayer(), event.getMessage());
-			event.setCancelled(true);
-		}
-	}
-
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player player = (Player) sender;
 		if(cmd.getName().equalsIgnoreCase("achat")) {
@@ -90,6 +66,65 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 		return false;
 	}
 
+	@Override
+	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+		if(channel.equals(mainChannel)) {
+			DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+			try {
+				in.readFully(message);
+				while(in.available() > 0) {
+					System.out.print(in.readUTF());
+					String subChannel = in.readUTF();
+					if(subChannel.equals(subChannel)) {
+						sendStaffMessage(in.readUTF(), Bukkit.getPlayer(in.readUTF()), in.readUTF());
+					}
+				}
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@EventHandler
+	public void onPlayerChat(AsyncPlayerChatEvent event) {
+		if(isInAdminChat(event.getPlayer().getUniqueId())) {
+			sendBungeePayload(event.getPlayer(), event.getMessage());
+			event.setCancelled(true);
+		}
+	}
+
+	public void sendBungeePayload(Player player, String message) {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(b);
+		try {
+			out.writeUTF(subChannel);
+			out.writeUTF(serverName);
+			out.writeUTF(player.getName());
+			out.writeUTF(message);
+			player.sendPluginMessage(this, mainChannel, b.toByteArray());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendStaffMessage(String serverName, CommandSender sender, String message) {
+		for(Player staff : Bukkit.getOnlinePlayers()) {
+			if(staff.hasPermission(PERMISSION_RECEIVE_CHAT) || sender.isOp()) {
+				staff.sendMessage(DARK_GRAY + "[" + GOLD.toString() + "Staff Chat" + DARK_GRAY + "][" + YELLOW + serverName + DARK_GRAY + "] " + DARK_RED + sender.getName() + " " + DARK_GRAY + "» " + GREEN + translateAlternateColorCodes('&', message));
+			}
+		}
+		Bukkit.getLogger().info("[Staff Chat] " + sender.getName() + " » " + message);
+	}
+
+	public String buildString(String[] args) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for(String word : args) {
+			stringBuilder.append(ChatColor.translateAlternateColorCodes('&', word));
+			stringBuilder.append(" ");
+		}
+		return stringBuilder.substring(0, stringBuilder.length() - 1);
+	}
+
 	public boolean isInAdminChat(UUID player) {
 		return list.contains(player);
 	}
@@ -101,38 +136,5 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 	public void removePlayer(UUID player) {
 		if(!list.isEmpty())
 			list.remove(player);
-	}
-
-	public void sendStaffMessage(String serverName, CommandSender sender, String message) {
-		for(Player staff : Bukkit.getOnlinePlayers()) {
-			if(staff.hasPermission(PERMISSION_RECEIVE_CHAT)) {
-				staff.sendMessage(DARK_GRAY + "[" + GOLD.toString() + "Staff Chat" + DARK_GRAY + "][" + YELLOW + serverName + DARK_GRAY + "] " + DARK_RED + sender.getName() + " " + DARK_GRAY + "» " + GREEN + translateAlternateColorCodes('&', message));
-			}
-		}
-		Bukkit.getLogger().info("[Staff Chat] " + sender.getName() + " » " + message);
-	}
-
-	public void sendBungeePayload(Player player, String message) {
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(b);
-		try {
-			out.writeUTF("AdminChat");
-			out.writeUTF(serverName);
-			out.writeUTF(player.getName());
-			out.writeUTF(message);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		player.sendPluginMessage(this, mainChannel, b.toByteArray());
-		System.out.print(b.toString());
-	}
-
-	public String buildString(String[] args) {
-		StringBuilder stringBuilder = new StringBuilder();
-		for(String word : args) {
-			stringBuilder.append(ChatColor.translateAlternateColorCodes('&', word));
-			stringBuilder.append(" ");
-		}
-		return stringBuilder.substring(0, stringBuilder.length() - 1);
 	}
 }
