@@ -15,9 +15,10 @@ public class AdminChatBungee extends Plugin implements Listener {
 
 	@EventHandler
 	public void onMessageReceived(PluginMessageEvent event) {
-		if(event.getData() != null) {
+		if((event.getData() != null) && (ProxyServer.getInstance().getOnlineCount() != 0)) {
 			for(ServerInfo server : ProxyServer.getInstance().getServers().values()) {
-				server.sendData("BungeeCord", event.getData());
+				if(!server.getPlayers().isEmpty())
+					server.sendData("Bridge", event.getData());
 			}
 		}
 	}
