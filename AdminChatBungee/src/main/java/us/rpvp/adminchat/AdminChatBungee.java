@@ -9,19 +9,22 @@ import net.md_5.bungee.event.EventHandler;
 
 public class AdminChatBungee extends Plugin implements Listener {
 
-	String pluginChannel = "BungeeCord";
+	String pluginChannel = "RPvPChannel";
 
 	public void onEnable() {
+		getProxy().registerChannel(pluginChannel);
 		ProxyServer.getInstance().getPluginManager().registerListener(this, this);
 	}
 
 	@EventHandler
 	public void onMessageReceived(PluginMessageEvent event) {
-		if((event.getData() != null) && (ProxyServer.getInstance().getOnlineCount() != 0)) {
-			for(ServerInfo server : ProxyServer.getInstance().getServers().values()) {
-				if(!server.getPlayers().isEmpty())
-					server.sendData(pluginChannel, event.getData());
-			}
+		if(!event.getTag().equalsIgnoreCase(pluginChannel)) {
+			return;
+		}
+		System.out.print(pluginChannel + " received a message!");
+		for(ServerInfo server : ProxyServer.getInstance().getServers().values()) {
+			if(!server.getPlayers().isEmpty())
+				server.sendData(pluginChannel, event.getData());
 		}
 	}
 }

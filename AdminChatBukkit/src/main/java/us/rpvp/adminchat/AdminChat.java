@@ -15,6 +15,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import static org.bukkit.ChatColor.*;
 
@@ -22,7 +23,7 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	String serverName;
 	String subChannel = "AdminChat";
-	String pluginChannel = "BungeeCord";
+	String pluginChannel = "RPvPChannel";
 	String PERMISSION_USE_COMMAND = "adminchat.use";
 	String PERMISSION_RECEIVE_CHAT = "adminchat.receive";
 
@@ -68,22 +69,18 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		if(!channel.equals(pluginChannel)) {
+		if(!channel.equalsIgnoreCase(pluginChannel)) {
 			return;
 		}
-		try {
-			DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-			String subchannel = in.readUTF();
-			short len = in.readShort();
-			byte[] msgBytes = new byte[len];
-			in.readFully(msgBytes);
-			DataInputStream msgIn = new DataInputStream(new ByteArrayInputStream(msgBytes));
 
-			if(subchannel.equals(subChannel)) {
-				sendStaffMessage(msgIn.readUTF(), Bukkit.getPlayer(msgIn.readUTF()), msgIn.readUTF());
+		DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+		try {
+			String sub = in.readUTF();
+			if(sub.equalsIgnoreCase(subChannel)) {
+				sendStaffMessage(in.readUTF(), Bukkit.getPlayer(in.readUTF()), in.readUTF());
 			}
 		} catch(IOException e) {
-			e.printStackTrace();
+			Bukkit.getLogger().log(Level.SEVERE, "Error receiving message", e);
 		}
 	}
 
@@ -97,23 +94,16 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	public void sendBungeePayload(Player player, String message) {
 		try {
-			ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-			DataOutputStream msgOut = new DataOutputStream(msgBytes);
-			msgOut.writeUTF(subChannel);
-			msgOut.writeUTF(serverName);
-			msgOut.writeUTF(player.getName());
-			msgOut.writeShort(message.length());
-
 			ByteArrayOutputStream b = new ByteArrayOutputStream();
 			DataOutputStream out = new DataOutputStream(b);
-			out.writeUTF("Forward");
-			out.writeUTF("ALL");
-			out.writeUTF("AdminChat");
-			out.writeShort(msgBytes.toByteArray().length);
-			out.write(msgBytes.toByteArray());
+			out.writeUTF(subChannel);
+			out.writeUTF(serverName);
+			out.writeUTF(player.getName());
+			out.writeUTF(message);
 			player.sendPluginMessage(this, pluginChannel, b.toByteArray());
+			System.out.print(b.toString());
 		} catch(Exception e) {
-			e.printStackTrace();
+			Bukkit.getLogger().log(Level.SEVERE, "Error sending message", e);
 		}
 	}
 
