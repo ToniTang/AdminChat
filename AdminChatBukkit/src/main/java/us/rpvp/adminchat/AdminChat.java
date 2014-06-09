@@ -77,7 +77,7 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 		try {
 			String sub = in.readUTF();
 			if(sub.equalsIgnoreCase(subChannel)) {
-				sendStaffMessage(in.readUTF(), Bukkit.getPlayer(in.readUTF()), in.readUTF());
+				sendStaffMessage(in.readUTF(), in.readUTF(), in.readUTF());
 			}
 		} catch(IOException e) {
 			Bukkit.getLogger().log(Level.SEVERE, "Error receiving message", e);
@@ -101,19 +101,18 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 			out.writeUTF(player.getName());
 			out.writeUTF(message);
 			player.sendPluginMessage(this, pluginChannel, b.toByteArray());
-			System.out.print(b.toString());
 		} catch(Exception e) {
 			Bukkit.getLogger().log(Level.SEVERE, "Error sending message", e);
 		}
 	}
 
-	public void sendStaffMessage(String serverName, CommandSender sender, String message) {
+	public void sendStaffMessage(String serverName, String senderName, String message) {
 		for(Player staff : Bukkit.getOnlinePlayers()) {
-			if(staff.hasPermission(PERMISSION_RECEIVE_CHAT) || sender.isOp()) {
-				staff.sendMessage(DARK_GRAY + "[" + GOLD.toString() + "Staff Chat" + DARK_GRAY + "][" + YELLOW + serverName + DARK_GRAY + "] " + DARK_RED + sender.getName() + " " + DARK_GRAY + "» " + GREEN + translateAlternateColorCodes('&', message));
+			if(staff.hasPermission(PERMISSION_RECEIVE_CHAT) || staff.isOp()) {
+				staff.sendMessage(DARK_GRAY + "[" + GOLD.toString() + "Staff Chat" + DARK_GRAY + "][" + YELLOW + serverName + DARK_GRAY + "] " + DARK_RED + senderName + " " + DARK_GRAY + "» " + GREEN + translateAlternateColorCodes('&', message));
 			}
 		}
-		Bukkit.getLogger().info("[Staff Chat] " + sender.getName() + " » " + message);
+		Bukkit.getLogger().info("[Staff Chat] " + senderName + " » " + message);
 	}
 
 	public String buildString(String[] args) {
