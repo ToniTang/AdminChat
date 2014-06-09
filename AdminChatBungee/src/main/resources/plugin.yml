@@ -1,0 +1,4 @@
+author: ToniTang
+name: AdminChatBungee
+main: us.rpvp.adminchat.AdminChatBungee
+version: ${project.version}

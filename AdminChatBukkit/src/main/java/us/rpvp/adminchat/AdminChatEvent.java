@@ -11,6 +11,7 @@ public class AdminChatEvent implements Listener {
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
 		if(PlayerList.getInstance().isInAdminChat(player.getUniqueId())) {
+			ChatUtil.sendBungeePayload(player, event.getMessage());
 			ChatUtil.sendStaffMessage(player, event.getMessage());
 			event.setCancelled(true);
 		}

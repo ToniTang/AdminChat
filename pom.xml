@@ -1,25 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>us.rpvp.adminchat</groupId>
-    <artifactId>AdminChat</artifactId>
+    <artifactId>AdminChatParent</artifactId>
     <version>0.1</version>
-    <name>AdminChat</name>
+
+    <name>AdminChatParent</name>
     <url>http://realmsofpvp.net/</url>
-    <repositories>
-        <repository>
-            <id>bukkit-repo</id>
-            <url>http://repo.bukkit.org/content/groups/public</url>
-        </repository>
-    </repositories>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>AdminChatBukkit</module>
+        <module>AdminChatBungee</module>
+    </modules>
+
     <build>
-        <finalName>${project.name}</finalName>
-        <defaultGoal>clean install</defaultGoal>
-        <resources>
-            <resource>
-                <filtering>true</filtering>
-                <directory>${basedir}/src/main/resources</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -32,11 +27,4 @@
             </plugin>
         </plugins>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.7.9-R0.2-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 </project>

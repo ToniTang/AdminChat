@@ -1,5 +1,6 @@
 package us.rpvp.adminchat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -49,8 +50,7 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener {
 		try {
 			String subchannel = in.readUTF();
 			if(subchannel.equals("AdminChat")) {
-				System.out.print("Player Name: " + in.readUTF());
-				System.out.print("Message Sent: " + in.readUTF());
+				ChatUtil.sendStaffMessage(Bukkit.getPlayer(in.readUTF()), in.readUTF());
 			}
 		} catch(IOException e) {
 			e.printStackTrace();

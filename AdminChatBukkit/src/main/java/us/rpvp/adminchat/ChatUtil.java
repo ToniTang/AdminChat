@@ -5,6 +5,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+
 import static org.bukkit.ChatColor.*;
 
 public class ChatUtil {
@@ -16,6 +19,20 @@ public class ChatUtil {
 			}
 		}
 		Bukkit.getLogger().info("[Staff Chat] " + sender.getName() + " » " + message);
+	}
+
+	public static void sendBungeePayload(Player player, String message) {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(b);
+		try {
+			out.writeUTF("AdminChat");
+			out.writeUTF(AdminChat.getServerName());
+			out.writeUTF(player.getName());
+			out.writeUTF(message);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		player.sendPluginMessage(AdminChat.getInstance(), "BungeeCord", b.toByteArray());
 	}
 
 	public static String buildString(String[] args) {
