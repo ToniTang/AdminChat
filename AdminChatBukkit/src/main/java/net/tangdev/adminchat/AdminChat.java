@@ -1,4 +1,4 @@
-package us.rpvp.adminchat;
+package net.tangdev.adminchat;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,48 +19,48 @@ import java.util.logging.Level;
 
 import static org.bukkit.ChatColor.*;
 
-public class AdminChat extends JavaPlugin implements PluginMessageListener, Listener, CommandExecutor {
+public class AdminChat extends JavaPlugin implements Listener, PluginMessageListener, CommandExecutor {
 
 	String serverName;
 	String subChannel = "AdminChat";
 	String pluginChannel = "RPvPChannel";
-	String PERMISSION_USE_COMMAND = "adminchat.use";
+	String PERMISSION_SEND_CHAT = "adminchat.send";
 	String PERMISSION_RECEIVE_CHAT = "adminchat.receive";
 
 	ArrayList<UUID> list = new ArrayList<>();
 
+	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 
-		serverName = getConfig().getString("serverName");
+		serverName = getConfig().getString("ServerName");
 
 		getServer().getMessenger().registerOutgoingPluginChannel(this, pluginChannel);
 		getServer().getMessenger().registerIncomingPluginChannel(this, pluginChannel, this);
-
 		getServer().getPluginManager().registerEvents(this, this);
 
-		getCommand("a").setExecutor(this);
+		getCommand("ac").setExecutor(this);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player player = (Player) sender;
-		if(cmd.getName().equalsIgnoreCase("a")) {
-			if(player.hasPermission(PERMISSION_USE_COMMAND) || player.isOp()) {
+		if(cmd.getName().equalsIgnoreCase("ac")) {
+			if(player.hasPermission(PERMISSION_SEND_CHAT) || player.isOp()) {
 				if(args.length > 0) {
 					String message = buildString(args);
 					sendBungeePayload(player, message);
 				} else {
 					if(!isInAdminChat(player.getUniqueId())) {
-						player.sendMessage(ChatColor.GREEN + "You have now switched to " + ChatColor.BOLD + "ADMIN CHAT");
+						player.sendMessage(ChatColor.YELLOW + "Admin Chat: " + ChatColor.GREEN + "Enabled");
 						addPlayer(player.getUniqueId());
 					} else {
-						player.sendMessage(ChatColor.RED + "You have now switched to " + ChatColor.BOLD + "SERVER CHAT");
+						player.sendMessage(ChatColor.YELLOW + "Admin Chat: " + ChatColor.RED + "Disabled");
 						removePlayer(player.getUniqueId());
 					}
 				}
 			} else {
-				player.sendMessage(ChatColor.RED + "You don't have permission for this!");
+				player.sendMessage(ChatColor.RED + "You don't have permission for this.");
 			}
 			return true;
 		}
@@ -69,15 +69,14 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		if(!channel.equalsIgnoreCase(pluginChannel)) {
+		if(!channel.equalsIgnoreCase(pluginChannel))
 			return;
-		}
 
-		DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+		DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(message));
 		try {
-			String sub = in.readUTF();
-			if(sub.equalsIgnoreCase(subChannel)) {
-				sendStaffMessage(in.readUTF(), in.readUTF(), in.readUTF());
+			String subChannel = inputStream.readUTF();
+			if(subChannel.equalsIgnoreCase(this.subChannel)) {
+				sendStaffMessage(inputStream.readUTF(), inputStream.readUTF(), inputStream.readUTF());
 			}
 		} catch(IOException e) {
 			Bukkit.getLogger().log(Level.SEVERE, "Error receiving message", e);
@@ -117,8 +116,8 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 
 	public String buildString(String[] args) {
 		StringBuilder stringBuilder = new StringBuilder();
-		for(String word : args) {
-			stringBuilder.append(ChatColor.translateAlternateColorCodes('&', word));
+		for(String words : args) {
+			stringBuilder.append(ChatColor.translateAlternateColorCodes('&', words));
 			stringBuilder.append(" ");
 		}
 		return stringBuilder.substring(0, stringBuilder.length() - 1);
@@ -133,7 +132,8 @@ public class AdminChat extends JavaPlugin implements PluginMessageListener, List
 	}
 
 	public void removePlayer(UUID player) {
-		if(!list.isEmpty())
+		if(!list.isEmpty() && list.contains(player)) {
 			list.remove(player);
+		}
 	}
 }

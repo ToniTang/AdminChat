@@ -1,10 +1,10 @@
 name: AdminChat
 author: ToniTang
-main: us.rpvp.adminchat.AdminChat
-url: http://realmsofpvp.net/
+main: net.tangdev.adminchat.AdminChat
+url: ${project.url}
 version: ${project.version}
 
 commands:
-  a:
-    usage: /a <message>
-    description: Allow use of the admin chat
+  ac:
+    usage: /ac <message ...>
+    description: Admin chat use

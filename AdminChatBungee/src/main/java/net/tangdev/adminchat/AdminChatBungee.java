@@ -1,4 +1,4 @@
-package us.rpvp.adminchat;
+package net.tangdev.adminchat;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -18,12 +18,13 @@ public class AdminChatBungee extends Plugin implements Listener {
 
 	@EventHandler
 	public void onMessageReceived(PluginMessageEvent event) {
-		if(!event.getTag().equalsIgnoreCase(pluginChannel)) {
+		if(!event.getTag().equalsIgnoreCase(pluginChannel))
 			return;
-		}
+
 		for(ServerInfo server : ProxyServer.getInstance().getServers().values()) {
-			if(!server.getPlayers().isEmpty())
+			if(!server.getPlayers().isEmpty()) {
 				server.sendData(pluginChannel, event.getData());
+			}
 		}
 	}
 }

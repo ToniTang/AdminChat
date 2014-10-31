@@ -1,4 +1,4 @@
-author: ToniTang
 name: AdminChatBungee
-main: us.rpvp.adminchat.AdminChatBungee
+author: ToniTang
+main: net.tangdev.adminchat.AdminChatBungee
 version: ${project.version}
