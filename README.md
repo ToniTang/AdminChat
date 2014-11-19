@@ -1,7 +1,7 @@
 AdminChat
 =========
 
-Bukkit &lt;-> Bungee &lt;-> Bukkit Staff Chat Messaging
+Bukkit ↔ Bungee ↔ Bukkit Staff Chat Messaging
 
 Big thanks to the follow people helped me with my first Bukkit/Bungee Bridge!  
   - Riking (For the most help I think I've ever gotten)  
